@@ -16,8 +16,8 @@ def get_csrf_config():
         )
 
     return {
-        "cookie_name": settings.CSRF_COOKIE_NAME,
-        "header_name": csrf_header_name,
+        "csrf_cookie_name": settings.CSRF_COOKIE_NAME,
+        "csrf_header_name": csrf_header_name,
     }
 
 
