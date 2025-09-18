@@ -4,6 +4,8 @@
     data-autocomplete-input-value="{{ widget.value }}"
     data-autocomplete-input-type="{{ widget.target_model }}"
     data-autocomplete-input-id="{{ widget.attrs.id }}"
+    data-autocomplete-csrf-cookie-name="{{ widget.csrf_cookie_name }}"
+    data-autocomplete-csrf-header-name="{{ widget.csrf_header_name }}"
     data-controller="autocomplete-controller"
     {% if widget.can_create %}data-autocomplete-input-can-create{% endif %}
     {% if widget.is_single %}data-autocomplete-input-is-single{% endif %}

@@ -1,13 +1,28 @@
 import json
 
-from django.forms import widgets, Media
+from django.conf import settings
+from django.forms import Media, widgets
 from wagtail.admin.staticfiles import versioned_static
 
 from .views import render_page
 
 
+def get_csrf_config():
+    csrf_header_name = settings.CSRF_HEADER_NAME
+    if csrf_header_name.startswith("HTTP_"):
+        # we have to transform from "HTTP_X_CSRFTOKEN" to "X-CSRFToken"
+        csrf_header_name = (
+            csrf_header_name.removeprefix("HTTP_").lower().replace("_", "-")
+        )
+
+    return {
+        "cookie_name": settings.CSRF_COOKIE_NAME,
+        "header_name": csrf_header_name,
+    }
+
+
 class Autocomplete(widgets.TextInput):
-    template_name = 'wagtailautocomplete/autocomplete.html'
+    template_name = "wagtailautocomplete/autocomplete.html"
 
     def __init__(self, target_model, can_create=False, is_single=True, attrs=None):
         super().__init__(attrs)
@@ -17,19 +32,25 @@ class Autocomplete(widgets.TextInput):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context['widget']['target_model'] = self.target_model._meta.label
-        context['widget']['can_create'] = self.can_create
-        context['widget']['is_single'] = self.is_single
+        context["widget"]["target_model"] = self.target_model._meta.label
+        context["widget"]["can_create"] = self.can_create
+        context["widget"]["is_single"] = self.is_single
+
+        # Add CSRF configuration
+        context["widget"].update(get_csrf_config())
+
         return context
 
     def format_value(self, value):
         if not value:
-            return 'null'
+            return "null"
         if isinstance(value, list):
-            return json.dumps([
-                render_page(page)
-                for page in self.target_model.objects.filter(pk__in=value)
-            ])
+            return json.dumps(
+                [
+                    render_page(page)
+                    for page in self.target_model.objects.filter(pk__in=value)
+                ]
+            )
         else:
             return json.dumps(render_page(self.target_model.objects.get(pk=value)))
 
@@ -42,19 +63,19 @@ class Autocomplete(widgets.TextInput):
         value = json.loads(original_value)
 
         if isinstance(value, list):
-            return [obj['pk'] for obj in value if 'pk' in obj]
+            return [obj["pk"] for obj in value if "pk" in obj]
         if isinstance(value, dict):
-            return value.get('pk', None)
+            return value.get("pk", None)
         return None
 
     @property
     def media(self):
         return Media(
             css={
-                'all': [versioned_static('wagtailautocomplete/dist.css')],
+                "all": [versioned_static("wagtailautocomplete/dist.css")],
             },
             js=[
-                versioned_static('wagtailautocomplete/dist.js'),
-                versioned_static('wagtailautocomplete/controller.js'),
+                versioned_static("wagtailautocomplete/dist.js"),
+                versioned_static("wagtailautocomplete/controller.js"),
             ],
         )

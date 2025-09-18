@@ -17,3 +17,8 @@ node_modules
 /build/
 /dist/
 wagtail_autocomplete.egg-info
+
+
+# IDE
+.vscode/
+.idea/

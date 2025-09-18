@@ -6,14 +6,23 @@ import AutocompleteInput from "./AutocompleteInput";
 
 const nc = namespaceClassName("c-wagtailautocomplete");
 
-const initAutocompleteInput = autocompleteNode => {
-  const wagtailadminHome = autocompleteNode.dataset.autocompleteWagtailadminHome;
+const initAutocompleteInput = (autocompleteNode) => {
+  const wagtailadminHome =
+    autocompleteNode.dataset.autocompleteWagtailadminHome;
   const name = autocompleteNode.dataset.autocompleteInputName;
   const value = JSON.parse(autocompleteNode.dataset.autocompleteInputValue);
   const type = autocompleteNode.dataset.autocompleteInputType;
   const labelId = autocompleteNode.dataset.autocompleteInputId;
   const canCreate = autocompleteNode.dataset.autocompleteInputCanCreate === "";
   const isSingle = autocompleteNode.dataset.autocompleteInputIsSingle === "";
+
+  // Read CSRF configuration
+  const csrfConfig = {
+    cookieName:
+      autocompleteNode.dataset.autocompleteCsrfCookieName || "csrftoken",
+    headerName:
+      autocompleteNode.dataset.autocompleteCsrfHeaderName || "X-CSRFToken",
+  };
 
   const hasValidData = name && type;
   if (!hasValidData) {
@@ -29,6 +38,7 @@ const initAutocompleteInput = autocompleteNode => {
       canCreate={canCreate}
       isSingle={isSingle}
       apiBase={wagtailadminHome + "autocomplete/"}
+      csrfConfig={csrfConfig}
     />,
     autocompleteNode
   );
